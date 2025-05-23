@@ -8,19 +8,21 @@ echo "                 m  #                                                   # 
 echo "                 \"\"  "
 echo "2025 Melanie Pacheco, 80hd_0                                              Version 1.1"
 echo "#####################################################################################"
-echo "Welcome to eaglersetup! This script sets up a fully functional eaglercraft server, and optionally sets up WSS for it too. If you have any issues, contact me on discord, username 80hd_0."
+echo "Welcome to eaglersetup! This script sets up a fully functional eaglercraft server. If you have any issues, contact me on discord, username 80hd_0."
 read -p "Before we begin, type anything at all if you understand the prerequisites (requirements) for running this server. Press enter if you don't understand/know. # " understandme
 if [ -z "$understandme" ]; then
 	echo "Here are the prerequisites for running this program and any eaglercraft server. Anything not listed here is done for you."
 	echo "REQUIRED:"
-	echo "- port 25565 port forwarded/open (unless you are setting up wss!). If you don't know what that is, please use our best friend Mr. Search Engine."
-	echo "REQUIRED FOR WSS:"
+	echo "- port 25565 open/port forwarded. this is where tcp/websockets will be hosted from, in otherwords Java and Eaglercraft."
+	echo "- a subdomain/domain pointed to the ip address of your vps/router"
+	echo "note - you can use "cloudflared" tunnels to portforward for Eaglercraft. Mind you, this will require you to own a domain, and a cloudflare account. this method only works for Eaglercraft and does not work for java."
+	echo "REQUIRED FOR Eaglercraft:"
 	echo "- port 443 port forwarded/open"
-	echo "- a web domain or subdomain (e.g. 80hdnet.work or eagler.80hdnet.work)"
-	echo "- an email (required for certificate, you won't be sent emails if you select no)"
+	echo "- a web domain or subdomain (e.g. example.com or example.example.com)"
+	# an email isnt actually required so.. echo "- an email (required for certificate, you won't be sent emails if you select no)"
 	exit 1
 fi
-read -p "First, please provide your domain if you want WSS support or leave it blank if you don't. # " domain
+read -p "First, please enter the domain you will using for the server for Eaglercraft support. # " domain
 read -p "Next, eaglersetup is creating a server folder for your server to go in. If you're already in it, type a period. Otherwise, type a name for the folder: # " folder
 if [ -z "$folder" ]; then
 	folder=.
@@ -30,7 +32,7 @@ git clone https://github.com/Eaglercraft-Templates/Eaglercraft-Server-Paper "$fo
 chmod +x ./$folder/run.sh
 echo "Done downloading the server!"
 if [ -n "$domain" ]; then
-	echo "Since you told us your domain, eaglersetup is now setting up WSS support with Apache2. Please note that this is not configured to work with NGINX. if you don't know what that is, you can ignore this message."
+	echo "Since you told us your domain, eaglersetup is now setting up websocket/eaglercraft support with Apache2. Please note that this is not configured to work with NGINX. if you don't know what that is, you can ignore this message."
 	echo "this part might take a while, especially if you don't have apache2 installed (on ubuntu it's preinstalled)"
 	sudo apt install apache2 -y > /dev/null 2>/dev/null
 	sudo apt install certbot -y > /dev/null 2>/dev/null
