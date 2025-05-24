@@ -18,6 +18,9 @@ if [ -z "$understandme" ]; then
 	echo "- port 443 port forwarded/open"
 	echo "- a web domain or subdomain (e.g. 80hdnet.work or eagler.80hdnet.work)"
 	echo "- an email (required for certificate, you won't be sent emails if you select no)"
+	echo "RECCOMENDED:"
+	echo "- some knowledge of how to own/setup a minecraft server"
+	echo "- java (the script tries to download it but it may not work on all systems!)"
 	exit 1
 fi
 read -p "First, please provide your domain if you want WSS support or leave it blank if you don't. # " domain
@@ -33,7 +36,7 @@ chmod +x ./$folder/run.sh
 echo "Done downloading the server!"
 if [ -n "$domain" ]; then
 	echo "Since you told us your domain, eaglersetup is now setting up WSS support with Apache2. Please note that this is not configured to work with NGINX. if you don't know what that is, you can ignore this message."
-	echo "this part might take a while, especially if you don't have apache2 installed (on ubuntu it's preinstalled)"
+	echo "this part might take a while, especially if you don't have apache installed."
 	sudo pacman -S --noconfirm apache > /dev/null 2>/dev/null
 	sudo pacman -S --noconfirm certbot > /dev/null 2>/dev/null
 	sudo systemctl stop httpd > /dev/null 2>/dev/null

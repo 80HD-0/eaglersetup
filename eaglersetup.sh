@@ -18,6 +18,9 @@ if [ -z "$understandme" ]; then
 	echo "- port 443 port forwarded/open"
 	echo "- a web domain or subdomain (e.g. 80hdnet.work or eagler.80hdnet.work)"
 	echo "- an email (required for certificate, you won't be sent emails if you select no)"
+	echo "RECCOMENDED:"
+	echo "- some knowledge of how to own/setup a minecraft server"
+	echo "- java (the script tries to download it but it may not work on all systems!)"
 	exit 1
 fi
 read -p "First, please provide your domain if you want WSS support or leave it blank if you don't. # " domain
@@ -27,6 +30,12 @@ if [ -z "$folder" ]; then
 fi
 echo "Eaglersetup is now downloading the server. This might take a bit."
 git clone https://github.com/Eaglercraft-Templates/Eaglercraft-Server-Paper "$folder"
+javacontents=$(which java)
+if ! echo "$javacontents" | grep -q "java"; then
+	echo "You don\'t have java! This script will try to download it on your system. If the script fails, it\'s likely this step that\'s breaking, and you should install it manually!"
+	sudo apt install openjdk-8-jre > /dev/null 2>/bin/bash
+	echo "Install complete!"
+fi
 chmod +x ./$folder/run.sh
 echo "Done downloading the server!"
 if [ -n "$domain" ]; then
@@ -34,11 +43,6 @@ if [ -n "$domain" ]; then
 	echo "this part might take a while, especially if you don't have apache2 installed (on ubuntu it's preinstalled)"
 	sudo apt install apache2 -y > /dev/null 2>/dev/null
 	sudo apt install certbot -y > /dev/null 2>/dev/null
-	apt install -y wget apt-transport-https gpg # this part is ripped from docs.eags.pw (no need to reinvent the wheel)
-	wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null
-	echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
-	apt update
-	apt install temurin-17-jdk # rest is mine
 	sudo systemctl stop apache2 > /dev/null 2>/dev/null
 	sudo certbot certonly --standalone -d "$domain"
 	sudo systemctl start apache2 > /dev/null 2>/dev/null
