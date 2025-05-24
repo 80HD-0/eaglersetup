@@ -16,6 +16,7 @@ if [ -z "$understandme" ]; then
 	echo "- port 25565 port forwarded/open (unless you are setting up wss!). If you don't know what that is, please use our best friend Mr. Search Engine."
 	echo "REQUIRED FOR WSS:"
 	echo "- port 443 port forwarded/open"
+	echo "- port 80 port forwarded/open"
 	echo "- a web domain or subdomain (e.g. 80hdnet.work or eagler.80hdnet.work)"
 	echo "- an email (required for certificate, you won't be sent emails if you select no)"
 	echo "RECCOMENDED:"
@@ -30,10 +31,9 @@ if [ -z "$folder" ]; then
 fi
 echo "Eaglersetup is now downloading the server. This might take a bit."
 git clone https://github.com/Eaglercraft-Templates/Eaglercraft-Server-Paper "$folder"
-javacontents=$(which java)
-if ! echo "$javacontents" | grep -q "java"; then
+if [ -z "$(which java)" ]; then
 	echo "You don\'t have java! This script will try to download it on your system. If the script fails, it\'s likely this step that\'s breaking, and you should install it manually!"
-	sudo apt install openjdk-8-jre > /dev/null 2>/bin/bash
+	sudo apt install -y openjdk-8-jre > /dev/null
 	echo "Install complete!"
 fi
 chmod +x ./$folder/run.sh
@@ -51,26 +51,30 @@ if [ -n "$domain" ]; then
 		port=25565
 	fi
 	sudo tee /etc/apache2/sites-available/$domain.conf > /dev/null <<EOF
-	<VirtualHost *:443>
-	    ServerName $domain
+<VirtualHost *:443>
+    ServerName $domain
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/$domain/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/$domain/privkey.pem
 
-	    SSLEngine on
-	    SSLCertificateFile /etc/letsencrypt/live/$domain/fullchain.pem
-	    SSLCertificateKeyFile /etc/letsencrypt/live/$domain/privkey.pem
+    ProxyPreserveHost On
+    ProxyRequests Off
+    ProxyPass / ws://localhost:$port/
+    ProxyPassReverse / ws://localhost:$port/
 
-	    ProxyPreserveHost On
-	    ProxyRequests Off
-	    ProxyPass / ws://localhost:$port/
-	    ProxyPassReverse / ws://localhost:$port/
+    RewriteEngine On
+    RewriteCond %{HTTP:Upgrade} =websocket [NC]
+    RewriteRule /(.*) ws://localhost:$port/\$1 [P,L]
 
-	    RewriteEngine On
-	    RewriteCond %{HTTP:Upgrade} =websocket [NC]
-	    RewriteRule /(.*) ws://localhost:$port/\$1 [P,L]
-
-	    ErrorLog \${APACHE_LOG_DIR}/$domain-error.log
-	    CustomLog \${APACHE_LOG_DIR}/$domain-access.log combined
-	</VirtualHost>
+    ErrorLog \${APACHE_LOG_DIR}/$domain-error.log
+    CustomLog \${APACHE_LOG_DIR}/$domain-access.log combined
+</VirtualHost>
 EOF
+	read -p "Is there already a website running on Apache2? If you don't know what this means, press enter. [yN] # " yn2
+	if [ "$yn" = "y" ] || [ "$yn" = "Y" ] || [ -z "$yn" ]; then
+		echo "Eaglersetup is disabling the default Apache2 config. It's easy to fix if you decide to make a website later."
+		sudo a2dissite *default*
+	fi
 	sudo a2enmod proxy proxy_http proxy_wstunnel rewrite ssl > /dev/null
 	sudo a2ensite "$domain.conf" > /dev/null
 	sudo systemctl restart apache2

@@ -16,6 +16,7 @@ if [ -z "$understandme" ]; then
 	echo "- port 25565 port forwarded/open (unless you are setting up wss!). If you don't know what that is, please use our best friend Mr. Search Engine."
 	echo "REQUIRED FOR WSS:"
 	echo "- port 443 port forwarded/open"
+	echo "- port 80 port forwarded/open"
 	echo "- a web domain or subdomain (e.g. 80hdnet.work or eagler.80hdnet.work)"
 	echo "- an email (required for certificate, you won't be sent emails if you select no)"
 	echo "RECCOMENDED:"
@@ -47,25 +48,24 @@ if [ -n "$domain" ]; then
 		port=25565
 	fi
 	sudo tee /etc/httpd/conf/extra/$domain.conf > /dev/null <<EOF
-	<VirtualHost *:443>
-	    ServerName $domain
+<VirtualHost *:443>
+    ServerName $domain
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/$domain/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/$domain/privkey.pem
 
-	    SSLEngine on
-	    SSLCertificateFile /etc/letsencrypt/live/$domain/fullchain.pem
-	    SSLCertificateKeyFile /etc/letsencrypt/live/$domain/privkey.pem
+    ProxyPreserveHost On
+    ProxyRequests Off
+    ProxyPass / ws://localhost:$port/
+    ProxyPassReverse / ws://localhost:$port/
 
-	    ProxyPreserveHost On
-	    ProxyRequests Off
-	    ProxyPass / ws://localhost:$port/
-	    ProxyPassReverse / ws://localhost:$port/
+    RewriteEngine On
+    RewriteCond %{HTTP:Upgrade} =websocket [NC]
+    RewriteRule /(.*) ws://localhost:$port/\$1 [P,L]
 
-	    RewriteEngine On
-	    RewriteCond %{HTTP:Upgrade} =websocket [NC]
-	    RewriteRule /(.*) ws://localhost:$port/\$1 [P,L]
-
-	    ErrorLog \${APACHE_LOG_DIR}/$domain-error.log
-	    CustomLog \${APACHE_LOG_DIR}/$domain-access.log combined
-	</VirtualHost>
+    ErrorLog \${APACHE_LOG_DIR}/$domain-error.log
+    CustomLog \${APACHE_LOG_DIR}/$domain-access.log combined
+</VirtualHost>
 EOF
 	sudo sed -i '/^#LoadModule proxy_module/s/^#//' /etc/httpd/conf/httpd.conf
 	sudo sed -i '/^#LoadModule proxy_http_module/s/^#//' /etc/httpd/conf/httpd.conf
@@ -75,6 +75,15 @@ EOF
 	if ! grep -q "extra/$domain.conf" /etc/httpd/conf/httpd.conf; then
     		echo "Include conf/extra/$domain.conf" | sudo tee -a /etc/httpd/conf/httpd.conf
 	fi
+	read -p "Is there already a website running on Apache2? If you don't know what this means, press enter. [yN] # " yn2
+	if [ "$yn" = "y" ] || [ "$yn" = "Y" ] || [ -z "$yn" ]; then
+		echo "Eaglersetup is disabling the default Apache2 config. It's easy to fix if you decide to make a website later."
+		mv /etc/httpd/conf/extra/httpd-vhosts.conf /etc/httpd/conf/extra/httpd-vhosts.conf.disabled
+		mv /etc/httpd/conf/extra/httpd-ssl.conf /etc/httpd/conf/extra/httpd-ssl.conf.disabled
+		sed -i 's/^Include.*httpd-vhosts.conf/#&/' /etc/httpd/conf/httpd.conf
+		sed -i 's/^Include.*httpd-ssl.conf/#&/' /etc/httpd/conf/httpd.conf
+	fi
+
 	sudo systemctl restart httpd
 	sed -i 's/25565/$port/' $folder/server.properties
 fi
