@@ -71,7 +71,7 @@ if [ -n "$domain" ]; then
 </VirtualHost>
 EOF
 	read -p "Is there already a website running on Apache2? If you don't know what this means, press enter. [yN] # " yn2
-	if [ "$yn" = "y" ] || [ "$yn" = "Y" ] || [ -z "$yn" ]; then
+	if [ "$yn" = "n" ] || [ "$yn" = "N" ] || [ -z "$yn" ]; then
 		echo "Eaglersetup is disabling the default Apache2 config. It's easy to fix if you decide to make a website later."
 		sudo a2dissite *default*
 	fi

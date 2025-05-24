@@ -76,12 +76,12 @@ EOF
     		echo "Include conf/extra/$domain.conf" | sudo tee -a /etc/httpd/conf/httpd.conf
 	fi
 	read -p "Is there already a website running on Apache2? If you don't know what this means, press enter. [yN] # " yn2
-	if [ "$yn" = "y" ] || [ "$yn" = "Y" ] || [ -z "$yn" ]; then
+	if [ "$yn" = "n" ] || [ "$yn" = "N" ] || [ -z "$yn" ]; then
 		echo "Eaglersetup is disabling the default Apache2 config. It's easy to fix if you decide to make a website later."
-		mv /etc/httpd/conf/extra/httpd-vhosts.conf /etc/httpd/conf/extra/httpd-vhosts.conf.disabled
-		mv /etc/httpd/conf/extra/httpd-ssl.conf /etc/httpd/conf/extra/httpd-ssl.conf.disabled
-		sed -i 's/^Include.*httpd-vhosts.conf/#&/' /etc/httpd/conf/httpd.conf
-		sed -i 's/^Include.*httpd-ssl.conf/#&/' /etc/httpd/conf/httpd.conf
+		sudo mv /etc/httpd/conf/extra/httpd-vhosts.conf /etc/httpd/conf/extra/httpd-vhosts.conf.disabled
+		sudo mv /etc/httpd/conf/extra/httpd-ssl.conf /etc/httpd/conf/extra/httpd-ssl.conf.disabled
+		sudo sed -i 's/^Include.*httpd-vhosts.conf/#&/' /etc/httpd/conf/httpd.conf
+		sudo sed -i 's/^Include.*httpd-ssl.conf/#&/' /etc/httpd/conf/httpd.conf
 	fi
 
 	sudo systemctl restart httpd
