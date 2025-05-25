@@ -6,7 +6,7 @@ echo "    #\"\"\"\"  m\"\"\"#  #   #    #    #\"\"\"\"   #      \"\"\"m  #\"\"\"
 echo "   \"#mm\"  \"mm\"#  \"#m\"#    \"mm  \"#mm\"   #     \"mmm\"  \"#mm\"    \"mm  \"mm\"#  ##m#\" "
 echo "                 m  #                                                   #     "
 echo "                 \"\"  "
-echo "2025 Melanie Pacheco, 80hd_0                                              Version 1.1"
+echo "2025 Melanie Pacheco, 80hd_0                                       Arch - Version 1.1"
 echo "#####################################################################################"
 echo "Welcome to eaglersetup! This script sets up a fully functional eaglercraft server, and optionally sets up WSS for it too. If you have any issues, contact me on discord, username 80hd_0."
 read -p "Before we begin, type anything at all if you understand the prerequisites (requirements) for running this server. Press enter if you don't understand/know. # " understandme
@@ -88,7 +88,7 @@ EOF
 	sed -i 's/25565/$port/' $folder/server.properties
 fi
 read -p "Now do you want to run the server? [Y/n] # " yn
-if [ "$yn" = "y" ] || [ "$yn" = "Y" ] || [ -z "$yn" ]; then
+if [ "$yn2" = "n" ] || [ "$yn2" = "N" ] || [ -z "$yn2" ]; then
 	echo "Okay! starting the server..."
 	cd $folder
 	./run.sh
