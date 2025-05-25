@@ -1,6 +1,7 @@
 - WSS
 - - 80HD-0, Ubuntu 22.04.5
--WS
+- WS
 - - 80HD-0, Ubuntu 22.04.5
 - - 80HD-0, Arch 2025.05.2
 - - 80HD-0, Debian 12
+- - ItsZekRom, Mint 20.3
