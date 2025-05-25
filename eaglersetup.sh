@@ -21,7 +21,7 @@ if [ -z "$understandme" ]; then
 	echo "- an email (required for certificate, you won't be sent emails if you select no)"
 	echo "RECCOMENDED:"
 	echo "- some knowledge of how to own/setup a minecraft server"
-	echo "- java (the script tries to download it but it may not work on all systems!)"
+	echo "- java (the script tries to download it but it may fail. You should probably get your preferred version first.)"
 	exit 1
 fi
 read -p "First, please provide your domain if you want WSS support or leave it blank if you don't. # " domain
@@ -33,7 +33,7 @@ echo "Eaglersetup is now downloading the server. This might take a bit."
 git clone https://github.com/Eaglercraft-Templates/Eaglercraft-Server-Paper "$folder"
 if [ -z "$(which java)" ]; then
 	echo "You don\'t have java! This script will try to download it on your system. If the script fails, it\'s likely this step that\'s breaking, and you should install it manually!"
-	sudo apt install -y openjdk-8-jre > /dev/null
+	sudo apt install -y default-jre > /dev/null
 	echo "Install complete!"
 fi
 chmod +x ./$folder/run.sh
