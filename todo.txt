@@ -1,0 +1,7 @@
+PROBABLY NEXT UPDATE
+- Add basic server setup (name, seed, etc.)
+- Add more disclaimers
+PROBABLY LATER
+- B I M B O W S   S U P P P O R T
+PROBABLY A LOT LATER
+- Add auto plugin downloading for lazy eaglers
